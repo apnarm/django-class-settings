@@ -15,9 +15,18 @@ def setup():
     if _setup:
         return
 
+    class SimpleLazySettings(SimpleLazyObject):
+
+        def __repr__(self):
+            return env('DJANGO_SETTINGS_MODULE')
+
     sys.meta_path.append(SettingsImporter)
     default_settings = LazySettingsModule()
-    settings_module = SimpleLazyObject(lambda: default_settings.SETTINGS_MODULE)
+
+    def default_settings_module():
+        return default_settings.SETTINGS_MODULE
+
+    settings_module = SimpleLazySettings(default_settings_module)
     settings.configure(default_settings, SETTINGS_MODULE=settings_module)
 
     _setup = True
