@@ -118,7 +118,11 @@ class SettingsImporter:
 
     @classmethod
     def create_module(cls, spec):
-        settings_module, settings_class = spec.name.rsplit(":", maxsplit=1)
+        settings_name, settings_module, settings_class = spec.name, None, None
+        while ':' in settings_name:
+            # workaround for reloading with settings_module_path:settings_class:settings_class
+            settings_module, settings_class = settings_name.rsplit(":", maxsplit=1)
+            settings_name = settings_module
         module = importlib.import_module(settings_module)
         try:
             settings_cls = getattr(module, settings_class)
